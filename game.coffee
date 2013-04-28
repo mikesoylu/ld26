@@ -1,18 +1,26 @@
 v = cp.v
+
+# constants
 TILE_WIDTH = 32
 TILE_HEIGHT = 32
-MAP_WIDTH = 4
-MAP_HEIGHT = 4
+
+TILE_GROUP = 2
+PLAYER_GROUP = 1
+
+MAP_WIDTH = 16
+MAP_HEIGHT = 16
+
+COLOR_PALETTE = ["#CDD1FF", "#6C72B2", "#B3BAFF", "#B29F5A", "#FFEFB3"]
 
 class Tilemap
-  constructor: (noise, depth, @space) ->
+  constructor: (noise, @depth, @space) ->
     @tiles = new Array
     for i in [0..MAP_WIDTH]
       for j in [0..MAP_HEIGHT]
         xx = i * TILE_WIDTH
         yy = j * TILE_HEIGHT
-        if noise.noise3d(i, j, depth*0.2)>0.5 then @tiles.push(new Tile(xx, yy, @space)) else null
-        #if noise.noise3d(i*0.1, j*0.1, depth*0.2)>0.5 then @tiles.push(new Tile(xx, yy, @space)) else null
+        if noise.noise3d(i*0.1, j*0.1, depth*0.1)>0.4
+        then @tiles.push(new Tile(xx, yy, @space)) else null
 
   draw: ->
     for i in @tiles
@@ -26,11 +34,12 @@ class Tile extends cp.Body
     @width = TILE_WIDTH
     @height = TILE_HEIGHT
     @shape = new cp.BoxShape(@, @width, @height)
+    @shape.group = TILE_GROUP
     space.addBody(@)
     space.addShape(@shape)
 
   draw: ->
-    atom.context.fillStyle = "white"
+    atom.context.fillStyle = COLOR_PALETTE[1]
     atom.context.fillRect(@p.x-@width/2, @p.y-@height/2, @width, @height)
 
 
@@ -41,11 +50,12 @@ class Entity extends cp.Body
     @shape = new cp.CircleShape(@, Math.max(@width*0.5, @height*0.5), v(0,0))
     @shape.setFriction(0.5)
     @shape.setElasticity(0.8)
+    @shape.group = PLAYER_GROUP
     space.addBody(@)
     space.addShape(@shape)
 
   draw: ->
-    atom.context.fillStyle = "white"
+    atom.context.fillStyle = COLOR_PALETTE[4]
     atom.context.save()
     atom.context.translate(@p.x, @p.y)
     atom.context.rotate(@a)
@@ -63,6 +73,7 @@ class Game extends atom.Game
     for i in [0..4]
       @tilemaps[i] = new Tilemap(noise, i, @space)
     @tilemap = @tilemaps[0]
+    @player.shape.layers = 1
     @updateTiles()
 
     atom.input.bind(atom.key.LEFT_ARROW, "left")
@@ -78,10 +89,10 @@ class Game extends atom.Game
     for i in @tilemaps
       if i is @tilemap
         for j in i.tiles
-          j.active = true
+          j.shape.layers = 1
       else
         for j in i.tiles
-          j.active = false
+          j.shape.layers = 0
 
   update: (dt) ->
     @player.resetForces()
@@ -110,7 +121,7 @@ class Game extends atom.Game
     @space.step(dt)
 
   draw: ->
-    atom.context.fillStyle = "#000"
+    atom.context.fillStyle = COLOR_PALETTE[2]
     atom.context.fillRect(0, 0, atom.width, atom.height)
     atom.context.save()
     atom.context.translate(-@player.p.x+atom.width*0.5,
