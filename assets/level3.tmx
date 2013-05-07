@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="16" height="32" tilewidth="32" tileheight="32">
- <objectgroup name="0" width="16" height="32">
+<map version="1.0" orientation="orthogonal" width="32" height="16" tilewidth="32" tileheight="32">
+ <objectgroup name="0" width="32" height="16">
   <object x="128" y="288" width="32" height="32"/>
   <object x="160" y="320" width="32" height="32"/>
   <object x="128" y="320" width="32" height="32"/>
@@ -16,23 +16,51 @@
   <object name="spawn" x="160" y="288" width="32" height="32"/>
   <object x="288" y="224" width="32" height="32"/>
   <object x="288" y="320" width="32" height="32"/>
-  <object x="320" y="224" width="32" height="32"/>
   <object x="320" y="320" width="32" height="32"/>
-  <object x="352" y="224" width="32" height="32"/>
   <object x="352" y="320" width="32" height="32"/>
-  <object x="384" y="224" width="32" height="32"/>
   <object x="384" y="320" width="32" height="32"/>
   <object x="416" y="224" width="32" height="32"/>
   <object x="416" y="320" width="32" height="32"/>
-  <object x="128" y="384" width="32" height="128"/>
-  <object x="160" y="384" width="64" height="32"/>
-  <object x="160" y="448" width="32" height="32"/>
-  <object x="256" y="384" width="32" height="128"/>
-  <object x="320" y="384" width="32" height="128"/>
-  <object x="352" y="416" width="32" height="32"/>
-  <object x="384" y="448" width="32" height="32"/>
-  <object x="416" y="384" width="32" height="128"/>
   <object x="416" y="256" width="32" height="32"/>
   <object x="416" y="288" width="32" height="32"/>
+  <object x="288" y="192" width="32" height="32"/>
+  <object x="288" y="160" width="32" height="32"/>
+  <object x="288" y="128" width="32" height="32"/>
+  <object x="320" y="128" width="32" height="32"/>
+  <object x="352" y="128" width="32" height="32"/>
+  <object x="384" y="128" width="32" height="32"/>
+  <object x="416" y="128" width="32" height="32"/>
+  <object x="416" y="192" width="32" height="32"/>
+  <object x="416" y="160" width="32" height="32"/>
+  <object x="352" y="384" width="32" height="32"/>
+  <object x="320" y="416" width="32" height="32"/>
+  <object x="384" y="416" width="32" height="32"/>
+  <object x="288" y="448" width="32" height="32"/>
+  <object x="416" y="448" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup name="1" width="32" height="16" visible="0">
+  <object x="288" y="256" width="32" height="32"/>
+  <object x="320" y="256" width="32" height="32"/>
+  <object x="352" y="256" width="32" height="32"/>
+  <object x="384" y="256" width="32" height="32"/>
+  <object x="416" y="256" width="32" height="32"/>
+  <object x="288" y="224" width="32" height="32"/>
+  <object x="288" y="192" width="32" height="32"/>
+  <object x="288" y="160" width="32" height="32"/>
+  <object x="288" y="128" width="32" height="32"/>
+  <object x="320" y="128" width="32" height="32"/>
+  <object x="352" y="128" width="32" height="32"/>
+  <object x="384" y="128" width="32" height="32"/>
+  <object x="416" y="128" width="32" height="32"/>
+  <object x="448" y="128" width="32" height="32"/>
+  <object x="480" y="128" width="32" height="32"/>
+  <object x="448" y="256" width="32" height="32"/>
+  <object x="480" y="256" width="32" height="32"/>
+  <object x="512" y="256" width="32" height="32"/>
+  <object x="512" y="128" width="32" height="32"/>
+  <object x="512" y="160" width="32" height="32"/>
+  <object x="512" y="192" width="32" height="32"/>
+  <object x="512" y="224" width="32" height="32"/>
+  <object name="goal" x="480" y="224" width="32" height="32"/>
  </objectgroup>
 </map>
