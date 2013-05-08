@@ -10,8 +10,16 @@ PLAYER_GROUP = 1
 MAP_WIDTH = 16
 MAP_HEIGHT = 16
 
-COLOR_PALETTE = ["#CDD1FF", "#6C72B2", "#B3BAFF", "#B29F5A", "#FFEFB3"]
+COLOR_PALETTES = [["#CDD1FF", "#6C72B2", "#B3BAFF", "#B29F5A", "#FFEFB3"],
+                  ["#2B2E36", "#54877E", "#B1B88C", "#F2D9A0", "#9E4C43"],
+                  ["#B8BBBF", "#9FA2A6", "#636364", "#D4E204", "#F2D9A0"],
+                  ["#B24504", "#FF660D", "#FF7626", "#00B2B2", "#0DFFFF"],
+                  ["#FF5A33", "#FFBEB0", "#FAF6F3", "#D6DAE2", "#364A73"],
+                  ["#F24968", "#03A64A", "#F2CB05", "#F79120", "#B296C6"]]
 
+# globals
+COLOR_PALETTE = COLOR_PALETTES[0]
+zoom = 0.1
 
 class Tilemap
   constructor: (objects, space) ->
@@ -35,6 +43,7 @@ class Tile extends cp.Body
     super(Infinity, Infinity)
     @setPos v(x+@width*0.5, y+@height*0.5)
     @shape = new cp.BoxShape(@, @width, @height)
+    @shape.setFriction(0)
     @shape.group = TILE_GROUP
     @colorIndex = 1
     @shape.collision_type = "tile"
@@ -43,7 +52,13 @@ class Tile extends cp.Body
 
   draw: ->
     atom.context.fillStyle = COLOR_PALETTE[@colorIndex]
+    atom.context.save()
+    if zoom > 1.01 || zoom < 0.99
+      atom.context.translate(@p.x, @p.y)
+      atom.context.scale(zoom, zoom)
+      atom.context.translate(-@p.x, -@p.y)
     atom.context.fillRect(@p.x-@width/2, @p.y-@height/2, @width, @height)
+    atom.context.restore()
 
 
 class Entity extends cp.Body
@@ -51,8 +66,8 @@ class Entity extends cp.Body
     super(1, Infinity)
     @setPos v(x, y)
     @shape = new cp.CircleShape(@, Math.max(@width*0.5, @height*0.5), v(0,0))
-    @shape.setFriction(0.5)
-    @shape.setElasticity(0.8)
+    @shape.setFriction(0)
+    @shape.setElasticity(0)
     @shape.group = PLAYER_GROUP
     @colorIndex = 4
     space.addBody(@)
@@ -63,21 +78,23 @@ class Entity extends cp.Body
     atom.context.save()
     atom.context.translate(@p.x, @p.y)
     atom.context.rotate(@a)
+    atom.context.scale(zoom, zoom)
     atom.context.fillRect(-@width/2, -@height/2, @width, @height)
+    #atom.context.arc(0, 0, @width/2, 0, 2 * Math.PI, false)
+    atom.context.fill()
     atom.context.restore()
 
 class Game extends atom.Game
   constructor: ->
     super()
-    @currentLevel = 1
+    @currentLevel = 3
     @reset()
 
   reset: ->
     @isLoaded = false
     @finishedLevel = false
-    @playerGrounded = false
     @space = new cp.Space()
-    @space.damping = 0.01
+    @space.damping = 0.5
 
     @player = new Entity(0, 0, @space)
     @player.shape.collision_type = "player"
@@ -107,14 +124,6 @@ class Game extends atom.Game
     @space.addCollisionHandler "player", "goal", (arb) =>
       if not @finishedLevel
         @finishedLevel = true
-        @space.addPostStepCallback @reachedGoal
-
-    @space.addCollisionHandler "player", "tile", null, null, (arb) =>
-      dx = arb.body_a.p.x-arb.body_b.p.x
-      dy = arb.body_a.p.y-arb.body_b.p.y
-      if dy<0 && Math.abs(dx)<PLAYER_WIDTH/2
-        @playerGrounded = true
-      return true
 
     atom.input.bind(atom.key.LEFT_ARROW, "left")
     atom.input.bind(atom.key.RIGHT_ARROW, "right")
@@ -141,25 +150,53 @@ class Game extends atom.Game
   update: (dt) ->
     if @isLoaded is false
       return
+
+    if @finishedLevel
+      zoom += -zoom*0.2
+      if zoom < 0.1
+        @reachedGoal()
+        zoom = 0.1
+    else
+      zoom += (1-zoom)*0.2
+
+    # is the player on a platform
+    playerGrounded = @space.pointQueryFirst(v(@player.p.x,
+      @player.p.y+PLAYER_HEIGHT/2+5), 1, PLAYER_GROUP)
+
+
     @player.resetForces()
+    # gravity
+    @player.applyForce(v(0,500), v(0,0))
 
-    @player.applyForce(v(0,1000), v(0,0))
-
+    keyFlag = false
     if atom.input.down("left")
-      @player.applyForce(v(-2000,0), v(0,0))
+      if @player.vx > 0
+        @player.vx *= 0.5
+      @player.applyForce(v(-500, 0), v(0,0))
+      keyFlag = true
 
     if atom.input.down("right")
-      @player.applyForce(v(2000,0), v(0,0))
+      if @player.vx < 0
+        @player.vx *= 0.5
+      @player.applyForce(v(500, 0), v(0,0))
+      keyFlag = true
 
-    if atom.input.pressed("up") && @playerGrounded
-      @player.vy = -500
+    if playerGrounded?
+      if not keyFlag
+        @player.vx *= 0.5
+      if atom.input.pressed("up")
+        @player.vy = -300
 
     if atom.input.pressed("a")
       @tilemap = @tilemaps.pop()
       @tilemaps.unshift(@tilemap)
+      COLOR_PALETTE = COLOR_PALETTES.pop()
+      COLOR_PALETTES.unshift(COLOR_PALETTE)
       @updateTiles()
 
-    @playerGrounded = false
+    if @player.p.y > 800
+      @reset()
+
     @space.step(dt)
     null
 
