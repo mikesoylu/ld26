@@ -87,7 +87,7 @@ class Entity extends cp.Body
 class Game extends atom.Game
   constructor: ->
     super()
-    @currentLevel = 3
+    @currentLevel = 1
     @reset()
 
   reset: ->

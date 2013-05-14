@@ -131,7 +131,7 @@
 
     function Game() {
       this.reachedGoal = __bind(this.reachedGoal, this);      Game.__super__.constructor.call(this);
-      this.currentLevel = 3;
+      this.currentLevel = 1;
       this.reset();
     }
 
